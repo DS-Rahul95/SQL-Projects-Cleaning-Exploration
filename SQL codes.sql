@@ -147,3 +147,110 @@ FROM layoffs_staging2;
 
 ALTER TABLE layoffs_staging2
 DROP Column row_num;
+
+-- Exploratory Data Analysis
+
+SELECT *
+FROM layoffs_staging2;
+
+SELECT MAX(total_laid_off), MAX(percentage_laid_off)
+FROM layoffs_staging2;
+
+SELECT *
+FROM layoffs_staging2
+WHERE percentage_laid_off>=1
+ORDER BY total_laid_off desc;
+
+SELECT *
+FROM layoffs_staging2
+WHERE percentage_laid_off>=1
+ORDER BY funds_raised_millions desc;
+
+SELECT company, SUM(total_laid_off)
+FROM layoffs_staging2
+group by company
+order by 2 desc;
+
+SELECT MIN(date), MAX(date)
+FROM layoffs_staging2;
+
+SELECT industry, SUM(total_laid_off)
+FROM layoffs_staging2
+group by industry
+order by 2 desc;
+
+SELECT location, SUM(total_laid_off)
+FROM layoffs_staging2
+group by location
+order by 2 desc;
+
+SELECT country, SUM(total_laid_off)
+FROM layoffs_staging2
+group by country
+order by 2 desc;
+
+SELECT date, SUM(total_laid_off)
+FROM layoffs_staging2
+group by date
+order by 2 desc;
+
+SELECT year(date), SUM(total_laid_off)
+FROM layoffs_staging2
+group by year(date)
+order by 2 desc;
+
+SELECT stage, SUM(total_laid_off)
+FROM layoffs_staging2
+group by stage
+order by 1 desc;
+
+SELECT company, SUM(percentage_laid_off)
+FROM layoffs_staging2
+group by company
+order by 2 desc;
+
+SELECT substring(date, 1, 7) AS month, sum(total_laid_off)
+FROM layoffs_staging2
+where substring(date, 1, 7) is not null
+group by month
+order by 1 asc;
+
+with rolling_total as
+(
+SELECT substring(date, 1, 7) AS month, sum(total_laid_off) as total_off
+FROM layoffs_staging2
+where substring(date, 1, 7) is not null
+group by month
+order by 1 asc
+)
+SELECT month, total_off,
+sum(total_off) over (order by month) as rolling_total
+FROM rolling_total;
+
+SELECT company, SUM(total_laid_off)
+FROM layoffs_staging2
+group by company
+order by 2 desc;
+
+SELECT company, year(date), sum(total_laid_off)
+FROM layoffs_staging2
+group by company, year(date)
+order by 3 desc;
+
+With Company_Year (company, years, total_laid_off) as
+(
+SELECT company, year(date), sum(total_laid_off)
+FROM layoffs_staging2
+group by company, year(date)
+), company_year_rank as 
+(
+SELECT *, 
+DENSE_RANK () 
+OVER (PARTITION BY years ORDER BY total_laid_off DESC) as Ranking
+FROM Company_year
+WHERE years is not null
+)
+SELECT *
+FROM company_year_rank
+WHere ranking <=5
+;
