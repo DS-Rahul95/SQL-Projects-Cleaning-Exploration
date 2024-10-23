@@ -1,4 +1,4 @@
-# DATA-CLEANING-WITH-SQL
+# DATA-CLEANING and EXPLORATION -WITH-SQL
 
 ## Overview
 This repository contains a comprehensive tutorial and guide on how to clean a real-world dataset using MySQL, focusing on data related to global layoffs. The project demonstrates how to identify and resolve common data issues such as duplicates, null values, inconsistencies, and formatting errors, to ensure that the dataset is clean, reliable, and ready for analysis.
